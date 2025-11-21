@@ -1,7 +1,5 @@
 # Panduan Fork → Clone → Branch → Commit → Push → Pull Request
 
-Panduan ini menjelaskan alur kerja Git yang **penting**, **ringkas**, dan **detail**, mulai dari melakukan *fork* hingga membuat *pull request*.
-
 ---
 
 ## ⚡ 1. Fork Repository
