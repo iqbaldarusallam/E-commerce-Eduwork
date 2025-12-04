@@ -13,7 +13,7 @@ use App\Models\Address;
 use App\Models\Transaction;
 use App\Models\TransactionItem;
 
-class IndonesianSeeder extends Seeder
+class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
