@@ -15,156 +15,127 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
+        <div class="min-h-screen flex flex-col bg-gray-100">
             <!-- Navigation -->
-            <nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
-                <!-- Primary Navigation Menu -->
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div class="flex justify-between h-16">
-                        <div class="flex items-center">
-                            <!-- Logo / Brand -->
-                            <div class="shrink-0 flex items-center">
-                                <a href="{{ route('user.dashboard') }}" class="font-bold text-xl text-blue-600">🛍️ EduWork Shop</a>
-                            </div>
+            <nav class="bg-white border-b border-gray-200">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center">
 
-                            <!-- Navigation Links -->
-                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <a href="{{ route('user.products.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('user.products.*') ? 'border-blue-400 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} text-sm font-medium leading-5 transition duration-150 ease-in-out">
-                                    {{ __('Shop') }}
-                                </a>
-                                @auth
-                                    <a href="{{ route('user.cart.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('user.cart.*') ? 'border-blue-400 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} text-sm font-medium leading-5 transition duration-150 ease-in-out">
-                                        {{ __('Cart') }} <span class="ml-1 bg-red-500 text-white text-xs px-2 py-1 rounded-full" id="cart-badge">{{ auth()->user()->cartItems()->count() }}</span>
-                                    </a>
-                                @endauth
-                            </div>
-                        </div>
-
-
-                        <!-- Right Menu -->
-                        <div class="hidden sm:flex sm:items-center sm:ms-6">
-                @auth
-                    <x-dropdown align="right" width="48">
-                        <x-slot name="trigger">
-                            <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                                <div>{{ auth()->user()->name }}</div>
-
-                                <div class="ms-1">
-                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                    </svg>
-                                </div>
-                            </button>
-                        </x-slot>
-
-                        <x-slot name="content">
-                                @if(auth()->user() && auth()->user()->is_admin)
-                                    <x-dropdown-link :href="route('admin.profile.edit')">
-                                        {{ __('Profile') }}
-                                    </x-dropdown-link>
-                                @else
-                                    <x-dropdown-link :href="route('user.profile.edit')">
-                                        {{ __('Profile') }}
-                                    </x-dropdown-link>
-                                @endif
-
-                            <!-- Authentication -->
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-
-                                <x-dropdown-link :href="route('logout')"
-                                        onclick="event.preventDefault();
-                                                    this.closest('form').submit();">
-                                    {{ __('Log Out') }}
-                                </x-dropdown-link>
-                            </form>
-                        </x-slot>
-                    </x-dropdown>
-                @else
-                    <div class="space-x-4">
-                        <a href="{{ route('login') }}" class="text-sm text-gray-700 hover:text-gray-900">{{ __('Log in') }}</a>
-                        @if (Route::has('register'))
-                            <a href="{{ route('register') }}" class="text-sm text-blue-600 hover:text-blue-800 font-medium">{{ __('Register') }}</a>
-                        @endif
+                    <!-- LEFT: BRAND -->
+                    <div class="flex-1">
+                        <a href="{{ route('user.dashboard') }}" class="text-2xl font-bold tracking-tight">
+                            🛍️ EduWork Shop
+                        </a>
                     </div>
-                @endauth
+
+                    <!-- CENTER: MENU -->
+                    <div class="hidden md:flex gap-10 text-sm items-center">
+                        <a href="{{ route('user.dashboard') }}"
+                        class="{{ request()->routeIs('user.dashboard') ? 'underline font-medium text-black' : 'text-gray-600 hover:text-black' }}">
+                            Home
+                        </a>
+
+                        <!-- SHOP  -->
+                        <a href="{{ route('user.products.index') }}"
+                        class="{{ request()->routeIs('user.products.*') ? 'underline font-medium text-black' : 'text-gray-600 hover:text-black' }}">
+                            Shop
+                        </a>
+
+                        <a href="#" class="text-gray-600 hover:text-black">Contact</a>
+                        <a href="#" class="text-gray-600 hover:text-black">About</a>
+
+                        @guest
+                            <a href="{{ route('register') }}" class="text-gray-600 hover:text-black">Sign Up</a>
+                        @endguest
+                    </div>
+
+                    <!-- RIGHT: SEARCH + ICONS -->
+                    <div class="flex-1 flex justify-end items-center gap-6 ml-10">
+
+                        <!-- SEARCH BAR -->
+                        <div class="hidden md:flex items-center bg-gray-100 rounded-md pl-4 pr-3 py-2 w-64">
+                            <form method="GET" action="{{ route('user.products.index') }}" class="flex items-center w-full">
+                                <input
+                                    type="text"
+                                    name="search"
+                                    value="{{ request('search') }}"
+                                    placeholder="What are you looking for?"
+                                    class="bg-gray-100 w-full text-sm outline-none"
+                                >
+                                <button type="submit" class="ml-2">
+                                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M21 21l-4.35-4.35M16 10a6 6 0 11-12 0 6 6 0 0112 0z" />
+                                    </svg>
+                                </button>
+                            </form>
                         </div>
 
-                    <!-- Hamburger -->
-                    <div class="-me-2 flex items-center sm:hidden">
-                        <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
-                            <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                                <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                                <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        <!-- HEART ICON -->
+                        <button aria-label="Wishlist">
+                            <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 21.364l-7.682-7.682a4.5 4.5 0 010-6.364z"/>
                             </svg>
                         </button>
+
+                        <!-- CART ICON -->
+                        <a href="{{ route('user.cart.index') }}" class="relative" aria-label="Cart">
+                            <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 9M17 13l2 9M6 22a1 1 0 100-2 1 1 0 000 2zm12 0a1 1 0 100-2 1 1 0 000 2z"/>
+                            </svg>
+
+                            @auth
+                            <span id="cart-badge"
+                                class="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                                {{ auth()->user()->cartItems()->count() }}
+                            </span>
+                            @endauth
+                        </a>
+
+                        <!-- AUTH DROPDOWN / LOGIN LINKS -->
+                        @auth
+                            <x-dropdown align="right" width="48">
+                                <x-slot name="trigger">
+                                    <button class="inline-flex items-center px-3 py-2 text-sm text-gray-700">
+                                        <div>{{ auth()->user()->name }}</div>
+                                        <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd"
+                                                d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
+                                                clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
+                                </x-slot>
+
+                                <x-slot name="content">
+                                    <!-- keep admin/user profile logic -->
+                                    @if(auth()->user() && auth()->user()->is_admin)
+                                        <x-dropdown-link :href="route('admin.profile.edit')">Profile</x-dropdown-link>
+                                    @else
+                                        <x-dropdown-link :href="route('user.profile.edit')">Profile</x-dropdown-link>
+                                    @endif
+
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <x-dropdown-link
+                                            :href="route('logout')"
+                                            onclick="event.preventDefault(); this.closest('form').submit();"
+                                        >Log Out</x-dropdown-link>
+                                    </form>
+                                </x-slot>
+                            </x-dropdown>
+                        @else
+                            <div class="hidden md:flex items-center gap-4">
+                                <a href="{{ route('login') }}" class="text-sm text-gray-700 hover:text-gray-900">Log in</a>
+                                @if (Route::has('register'))
+                                    <a href="{{ route('register') }}" class="text-sm text-blue-600 hover:text-blue-800 font-medium">Register</a>
+                                @endif
+                            </div>
+                        @endauth
                     </div>
                 </div>
-            </div>
+            </nav>
 
-            <!-- Responsive Navigation Menu -->
-            <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
-                <div class="pt-2 pb-3 space-y-1">
-                <x-responsive-nav-link :href="route('user.products.index')" :active="request()->routeIs('user.products.*')">
-                    {{ __('Shop') }}
-                </x-responsive-nav-link>
-                @auth
-                    <x-responsive-nav-link :href="route('user.cart.index')" :active="request()->routeIs('user.cart.*')">
-                        {{ __('Cart') }}
-                    </x-responsive-nav-link>
-                @endauth
-            </div>
-
-            <!-- Responsive Settings Options -->
-            <div class="pt-4 pb-1 border-t border-gray-200">
-                <div class="px-4">
-                    @auth
-                        <div class="font-medium text-base text-gray-800">{{ auth()->user()->name }}</div>
-                        <div class="font-medium text-sm text-gray-500">{{ auth()->user()->email }}</div>
-                    @else
-                        <div class="font-medium text-base text-gray-800">{{ __('Guest User') }}</div>
-                        <div class="font-medium text-sm text-gray-500">{{ __('Browse and shop') }}</div>
-                    @endauth
-                </div>
-
-                <div class="mt-3 space-y-1">
-                    @auth
-                        <x-responsive-nav-link :href="route('user.dashboard')">
-                            {{ __('Dashboard') }}
-                        </x-responsive-nav-link>
-                        @if(auth()->user() && auth()->user()->is_admin)
-                            <x-responsive-nav-link :href="route('admin.profile.edit')">
-                                {{ __('Profile') }}
-                            </x-responsive-nav-link>
-                        @else
-                            <x-responsive-nav-link :href="route('user.profile.edit')">
-                                {{ __('Profile') }}
-                            </x-responsive-nav-link>
-                        @endif
-
-                        <!-- Authentication -->
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-
-                            <x-responsive-nav-link :href="route('logout')"
-                                    onclick="event.preventDefault();
-                                                this.closest('form').submit();">
-                                {{ __('Log Out') }}
-                            </x-responsive-nav-link>
-                        </form>
-                    @else
-                        <x-responsive-nav-link :href="route('login')">
-                            {{ __('Log in') }}
-                        </x-responsive-nav-link>
-                        @if (Route::has('register'))
-                            <x-responsive-nav-link :href="route('register')">
-                                {{ __('Register') }}
-                            </x-responsive-nav-link>
-                        @endif
-                    @endauth
-                </div>
-            </div>
-        </nav>
 
             <!-- Flash Messages -->
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 py-2">
@@ -174,6 +145,7 @@
             <!-- Page Content -->
             <main>
                 @yield('content')
+                @include('layouts.footer')
             </main>
         </div>
     </body>
