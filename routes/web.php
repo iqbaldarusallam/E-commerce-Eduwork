@@ -39,6 +39,9 @@ Route::middleware(['auth'])->group(function () {
 
 // User authenticated routes
 Route::middleware(['auth'])->group(function () {
+    // Contact page route
+        Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
+        
     // Maintain legacy '/profile' routes for backward compatibility
     Route::get('/profile', [ProfileController::class, 'edit']);
     Route::patch('/profile', [ProfileController::class, 'update']);
@@ -68,6 +71,7 @@ Route::middleware(['auth'])->group(function () {
 
         // Address routes
         Route::resource('addresses', AddressController::class);
+
 
         // Checkout routes
         Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
