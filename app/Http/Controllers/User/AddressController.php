@@ -63,18 +63,20 @@ class AddressController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'recipient_name' => 'nullable|string|max:150',
-            'phone' => 'nullable|string|max:30',
-            'label' => 'nullable|string|max:100',
-            'address_text' => 'required|string|max:500',
-            'city' => 'nullable|string|max:100',
-            'district' => 'nullable|string|max:100',
-            'subdistrict' => 'nullable|string|max:100',
-            'province' => 'nullable|string|max:100',
-            'postal_code' => 'nullable|string|max:20',
-            'is_primary' => 'nullable|boolean',
-        ]);
+    $validated = $request->validate([
+    'recipient_name' => 'nullable|string|max:150',
+    'phone' => 'nullable|string|max:30',
+    'label' => 'nullable|string|max:100',
+    'address_text' => 'required|string|max:500',
+    'province' => 'nullable|string|max:100',
+    'city' => 'nullable|string|max:100',
+    'district_id' => 'nullable|string|max:100',
+    'district' => 'nullable|string|max:100',
+    'subdistrict' => 'nullable|string|max:100',
+    'postal_code' => 'nullable|string|max:20',
+    'is_primary' => 'nullable|boolean',
+    ]);
+
 
         $validated['user_id'] = Auth::id();
 
@@ -120,6 +122,7 @@ class AddressController extends Controller
             'label' => 'nullable|string|max:100',
             'address_text' => 'required|string|max:500',
             'city' => 'nullable|string|max:100',
+            'district_id' => 'nullable|string|max:100',
             'district' => 'nullable|string|max:100',
             'subdistrict' => 'nullable|string|max:100',
             'province' => 'nullable|string|max:100',
