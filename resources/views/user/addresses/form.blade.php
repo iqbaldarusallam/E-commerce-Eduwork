@@ -73,9 +73,12 @@
                         <label for="district" class="block text-xs font-semibold text-gray-500 mb-2">
                             District (Kecamatan)
                         </label>
-                        <select id="district" name="district" class="w-full bg-gray-100 px-3 py-3 rounded border">
-                            <option value="">-- Select District --</option>
-                        </select>
+                        <select id="district" name="district_id" class="w-full bg-gray-100 px-3 py-3 rounded border">
+    <option value="">-- Select District --</option>
+</select>
+
+<input type="hidden" name="district" id="district_name">
+
                     </div>
                 </div>
 
@@ -133,6 +136,7 @@ $(document).ready(function () {
     function loadCities(provinceId, selectedCity = null) {
         $('#city').html('<option>Loading...</option>');
         $('#district').html('<option value="">-- Select District --</option>');
+        $('#district_name').val('');
 
         if (!provinceId) return;
 
@@ -149,8 +153,9 @@ $(document).ready(function () {
         });
     }
 
-    function loadDistricts(cityId, selectedDistrict = null) {
+    function loadDistricts(cityId, selectedDistrictId = null) {
         $('#district').html('<option>Loading...</option>');
+        $('#district_name').val('');
 
         if (!cityId) return;
 
@@ -159,27 +164,46 @@ $(document).ready(function () {
 
             $.each(data, function (i, district) {
                 $('#district').append(`
-                    <option value="${district.id}" ${district.id == selectedDistrict ? 'selected' : ''}>
+                    <option value="${district.id}"
+                            data-name="${district.name}"
+                            ${district.id == selectedDistrictId ? 'selected' : ''}>
                         ${district.name}
                     </option>
                 `);
             });
+
+            // MODE EDIT
+            if (selectedDistrictId) {
+                let selected = $('#district option:selected');
+                $('#district_name').val(selected.data('name'));
+            }
         });
     }
 
+    // Province change
     $('#province').on('change', function () {
         loadCities($(this).val());
     });
 
+    // City change
     $('#city').on('change', function () {
         loadDistricts($(this).val());
     });
 
+    // District change
+    $('#district').on('change', function () {
+        let districtName = $(this).find(':selected').data('name');
+        $('#district_name').val(districtName);
+    });
+
+    // INITIAL LOAD FOR EDIT MODE
     @if(isset($address))
         loadCities("{{ $address->province }}", "{{ $address->city }}");
-        loadDistricts("{{ $address->city }}", "{{ $address->district }}");
+        loadDistricts("{{ $address->city }}", "{{ $address->district_id }}");
+        $('#district_name').val("{{ $address->district }}");
     @endif
 
 });
 </script>
 @endpush
+
