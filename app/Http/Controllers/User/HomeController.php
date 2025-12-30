@@ -10,7 +10,7 @@ class HomeController extends Controller
     //
     public function index()
     {
-        $categories = Category::select('id', 'name')->take(10)->get();
+        $categories = Category::select('id', 'name')->where('active', 1)->limit(10)->get();
 
         return view('user.home.index', compact('categories'));
     }

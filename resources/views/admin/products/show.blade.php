@@ -12,7 +12,7 @@
                             alt="{{ $product->name }}"
                             class="w-full h-full object-cover">
 
-                        @if($product->images->count() > 1)
+                       
 
                     </div>
 
