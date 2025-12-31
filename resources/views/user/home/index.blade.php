@@ -61,6 +61,9 @@
 
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
                 <!-- Product Card -->
+                 @foreach ($products as $product)
+                     
+                 @endforeach
                 <div class="border rounded-lg p-4 text-sm">
                     <img src="{{ asset('img/produk1.jpeg') }}" class="mb-3">
                     <h3 class="font-medium">Keyboard Gamen</h3>
