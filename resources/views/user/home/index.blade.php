@@ -1,4 +1,3 @@
-
 @extends('layouts.userNavbar')
 
 @section('content')
@@ -8,9 +7,9 @@
             <!-- Sidebar -->
             <aside class="hidden lg:block col-span-1 border-r pr-4">
                 <ul class="space-y-3 text-sm">
-                    
-                    @foreach ( $categories as $category )
-                      <li class="text-gray-600"><a href="">{{ $category->name }}</a></li>
+
+                    @foreach ($categories as $category)
+                        <li class="text-gray-600"><a href="">{{ $category->name }}</a></li>
                     @endforeach
                 </ul>
             </aside>
@@ -60,43 +59,40 @@
             </div>
 
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
-                <!-- Product Card -->
-                 @foreach ($products as $product)
-                     
-                 @endforeach
-                <div class="border rounded-lg p-4 text-sm">
-                    <img src="{{ asset('img/produk1.jpeg') }}" class="mb-3">
-                    <h3 class="font-medium">Keyboard Gamen</h3>
-                    <p class="text-red-500">Rp.310.000</p>
-                    <p class="text-xs line-through text-gray-400">Rp.660.000</p>
-                </div>
+                @foreach ($products as $product)
+                    <div class="border rounded-lg p-4 text-sm flex flex-col">
 
-                <div class="border rounded-lg p-4 text-sm">
-                    <img src="{{ asset('img/produk2.jpeg') }}" class="mb-3">
-                    <h3 class="font-medium">Monitor SPC</h3>
-                    <p class="text-red-500">Rp.610.000</p>
-                    <p class="text-xs line-through text-gray-400">Rp.1.100.000</p>
-                </div>
+                        {{-- IMAGE --}}
+                        @if ($product->images->first())
+                            <img src="{{ Storage::url($product->images->first()->url) }}"
+                                class="mb-3 w-full h-40 object-cover rounded">
+                        @else
+                            <div class="mb-3 w-full h-40 bg-gray-200 flex items-center justify-center text-gray-400">
+                                No Image
+                            </div>
+                        @endif
 
-                <div class="border rounded-lg p-4 text-sm">
-                    <img src="{{ asset('img/produk3.jpeg') }}" class="mb-3">
-                    <h3 class="font-medium">Gaming Pad Rexus</h3>
-                    <p class="text-red-500">Rp.210.000</p>
-                    <p class="text-xs line-through text-gray-400">Rp.400.000</p>
-                </div>
-                <div class="border rounded-lg p-4 text-sm">
-                    <img src="{{ asset('img/produk1.jpeg') }}" class="mb-3">
-                    <h3 class="font-medium">Keyboard Gamen</h3>
-                    <p class="text-red-500">Rp.310.000</p>
-                    <p class="text-xs line-through text-gray-400">Rp.660.000</p>
-                </div>
-                <div class="border rounded-lg p-4 text-sm">
-                    <img src="{{ asset('img/produk2.jpeg') }}" class="mb-3">
-                    <h3 class="font-medium">Monitor SPC</h3>
-                    <p class="text-red-500">Rp.610.000</p>
-                    <p class="text-xs line-through text-gray-400">Rp.1.100.000</p>
-                </div>
+                        {{-- NAME --}}
+                        <h3 class="font-medium text-sm line-clamp-2 min-h-[2.5rem]">
+                            {{ \Illuminate\Support\Str::limit($product->name, 60) }}
+                        </h3>
+
+                        {{-- PRICE --}}
+                        <p class="text-red-500 mt-1">
+                            Rp {{ number_format($product->price, 0, ',', '.') }}
+                        </p>
+
+                        {{-- DISCOUNT --}}
+                        @if ($product->old_price)
+                            <p class="text-xs line-through text-gray-400">
+                                Rp {{ number_format($product->old_price, 0, ',', '.') }}
+                            </p>
+                        @endif
+
+                    </div>
+                @endforeach
             </div>
+
 
 
             <div class="text-center mt-8">
