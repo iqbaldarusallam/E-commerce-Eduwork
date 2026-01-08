@@ -60,43 +60,45 @@
 
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
                 @foreach ($products as $product)
-                    <div class="border rounded-lg p-4 text-sm flex flex-col">
+                    <a href="{{ route('user.products.show', $product->slug) }}">
+                        <div class="border rounded-lg p-4 text-sm flex flex-col">
 
-                        {{-- IMAGE --}}
-                        @if ($product->images->first())
-                            <img src="{{ Storage::url($product->images->first()->url) }}"
-                                class="mb-3 w-full h-40 object-cover rounded">
-                        @else
-                            <div class="mb-3 w-full h-40 bg-gray-200 flex items-center justify-center text-gray-400">
-                                No Image
-                            </div>
-                        @endif
+                            {{-- IMAGE --}}
+                            @if ($product->images->first())
+                                <img src="{{ Storage::url($product->images->first()->url) }}"
+                                    class="mb-3 w-full h-40 object-cover rounded">
+                            @else
+                                <div class="mb-3 w-full h-40 bg-gray-200 flex items-center justify-center text-gray-400">
+                                    No Image
+                                </div>
+                            @endif
 
-                        {{-- NAME --}}
-                        <h3 class="font-medium text-sm line-clamp-2 min-h-[2.5rem]">
-                            {{ \Illuminate\Support\Str::limit($product->name, 60) }}
-                        </h3>
+                            {{-- NAME --}}
+                            <h3 class="font-medium text-sm line-clamp-2 min-h-[2.5rem]">
+                                {{ $product->name }}
+                            </h3>
 
-                        {{-- PRICE --}}
-                        <p class="text-red-500 mt-1">
-                            Rp {{ number_format($product->price, 0, ',', '.') }}
-                        </p>
-
-                        {{-- DISCOUNT --}}
-                        @if ($product->old_price)
-                            <p class="text-xs line-through text-gray-400">
-                                Rp {{ number_format($product->old_price, 0, ',', '.') }}
+                            {{-- PRICE --}}
+                            <p class="text-red-500 mt-1">
+                                Rp {{ number_format($product->price, 0, ',', '.') }}
                             </p>
-                        @endif
 
-                    </div>
+                            {{-- DISCOUNT --}}
+                            @if ($product->old_price)
+                                <p class="text-xs line-through text-gray-400">
+                                    Rp {{ number_format($product->old_price, 0, ',', '.') }}
+                                </p>
+                            @endif
+
+                        </div>
+                    </a>
                 @endforeach
             </div>
 
 
 
             <div class="text-center mt-8">
-                <a class="inline-block bg-red-500 text-white px-6 py-3 rounded">
+                <a href="{{ route('user.products.index') }}" class="inline-block bg-red-500 text-white px-6 py-3 rounded">
                     View All Products
                 </a>
             </div>
