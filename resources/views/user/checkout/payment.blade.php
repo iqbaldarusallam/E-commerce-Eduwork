@@ -185,7 +185,7 @@
                             await notifyServer(result.order_id);
                             hideLoading();
                             if (NF && NF.Notify) NF.Notify.success('Payment successful.');
-                            window.location.href = '/user/dashboard?payment=success&order=' + result.order_id;
+                            window.location.href = '{{ route('user.home') }}?payment=success&order=' + result.order_id;
                         },
                         onPending: function(result) {
                             hideLoading();
