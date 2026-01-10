@@ -52,7 +52,7 @@
                             </div>
                     <div class="flex items-center gap-6">
 
-                        <!-- SEARCH (desktop only) -->
+                        <!-- SEARCH  -->
                     <div class="hidden md:flex items-center bg-gray-100 rounded-md px-3 py-2 w-40 lg:w-64">
                     <form method="GET" action="{{ route('user.products.index') }}" class="flex items-center w-full">
 
