@@ -54,7 +54,7 @@ class TransactionController extends Controller
     public function update(Request $request, Transaction $transaction)
     {
         $validated = $request->validate([
-            'status' => 'required|in:pending,paid,shipped,completed,cancelled',
+            'status' => 'required|in:pending,paid,completed,cancelled',
         ]);
 
         $transaction->update($validated);

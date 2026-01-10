@@ -1,66 +1,70 @@
 @extends('layouts.adminNavbar')
 
 @section('content')
-    <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-900">Recent Orders</h1>
+<div class="p-8">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-3xl font-bold text-gray-900">Transactions</h1>
+        <div class="flex items-center gap-3">
+            <a href="#" class="text-blue-600 hover:text-blue-700 font-medium">Export</a>
+        </div>
     </div>
 
-    <!-- Search & Filter Form -->
-    <div class="mb-6 bg-white rounded-lg shadow p-4">
-        <form action="{{ route('admin.transactions.index') }}" method="GET" class="flex gap-4">
-            <input type="text" name="search" placeholder="Search by customer name or order #..." value="{{ request('search') }}"
-                class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-            <select name="status" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="">All Status</option>
-                <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
-                <option value="paid" {{ request('status') === 'paid' ? 'selected' : '' }}>Paid</option>
-                <option value="shipped" {{ request('status') === 'shipped' ? 'selected' : '' }}>Shipped</option>
-                <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Completed</option>
-                <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
-            </select>
-            <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                Search
-            </button>
-            @if(request('search') || request('status'))
-                <a href="{{ route('admin.transactions.index') }}" class="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500">
-                    Clear
-                </a>
-            @endif
-        </form>
+    <!-- Filter and Search -->
+    <div class="bg-white rounded-lg shadow mb-6 p-4 flex items-center gap-4">
+        <div class="flex-1 flex items-center gap-4">
+            <div>
+                <select id="filterStatus" class="px-4 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">All Status</option>
+                    <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
+                    <option value="paid" {{ request('status') === 'paid' ? 'selected' : '' }}>Paid</option>
+                    <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Completed</option>
+                    <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                </select>
+            </div>
+            <div class="flex-1 relative">
+                <i class="bi bi-search absolute left-3 top-2.5 text-gray-400"></i>
+                <input id="searchInput" type="text" placeholder="Search by customer or order #..." value="{{ request('search') }}" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+        </div>
+        <!-- no extra buttons -->
     </div>
 
     <div class="bg-white rounded-lg shadow overflow-hidden">
         <table class="w-full">
-            <thead class="bg-gray-100 border-b border-gray-200">
+            <thead class="bg-gray-50 border-b border-gray-200">
                 <tr>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Order #</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Customer</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Amount</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Status</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Date</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Actions</th>
+                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-900">Order #</th>
+                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-900">Customer</th>
+                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-900">Amount</th>
+                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-900">Status</th>
+                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-900">Date</th>
+                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-900">Actions</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
                 @forelse($transactions as $transaction)
-                    <tr class="hover:bg-gray-50">
+                    <tr class="hover:bg-gray-50 transition">
                         <td class="px-6 py-4 text-sm font-semibold text-gray-900">#{{ $transaction->id }}</td>
-                        <td class="px-6 py-4 text-sm text-gray-600">{{ $transaction->user->name }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-700">{{ $transaction->user->name ?? '—' }}</td>
                         <td class="px-6 py-4 text-sm font-semibold text-gray-900">Rp {{ number_format($transaction->total_amount + $transaction->shipping_fee) }}</td>
                         <td class="px-6 py-4 text-sm">
-                            <span class="px-3 py-1 rounded-full text-xs font-semibold
-                                {{ $transaction->status === 'paid' ? 'bg-green-100 text-green-800' : '' }}
-                                {{ $transaction->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : '' }}
-                                {{ $transaction->status === 'cancelled' ? 'bg-red-100 text-red-800' : '' }}
-                                {{ $transaction->status === 'shipped' ? 'bg-blue-100 text-blue-800' : '' }}
-                                {{ $transaction->status === 'completed' ? 'bg-purple-100 text-purple-800' : '' }}
-                            ">
-                                {{ ucfirst($transaction->status) }}
-                            </span>
+                            @php
+                                $s = $transaction->status;
+                                $statusClass = match($s) {
+                                    'pending' => 'bg-yellow-100 text-yellow-800',
+                                    'paid' => 'bg-blue-100 text-blue-800',
+                                    'cancelled' => 'bg-red-100 text-red-800',
+                                    'completed' => 'bg-green-100 text-green-800',
+                                    default => 'bg-gray-100 text-gray-800',
+                                };
+                            @endphp
+                            <span class="px-3 py-1 rounded-full text-xs font-semibold {{ $statusClass }}">{{ ucfirst($s) }}</span>
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-600">{{ $transaction->created_at->format('M d, Y') }}</td>
-                        <td class="px-6 py-4 text-sm">
-                            <a href="{{ route('admin.transactions.show', $transaction) }}" class="text-blue-600 hover:text-blue-800 font-semibold">View</a>
+                        <td class="px-6 py-4 text-sm text-gray-700">{{ $transaction->created_at->format('d M Y') }}</td>
+                        <td class="px-6 py-4 text-sm flex items-center gap-1">
+                            <a href="{{ route('admin.transactions.show', $transaction) }}" title="View" class="p-1 hover:bg-gray-100 rounded-lg text-gray-500 transition">
+                                <i class="bi bi-eye-fill text-lg"></i>
+                            </a>
                         </td>
                     </tr>
                 @empty
@@ -75,4 +79,25 @@
     <div class="mt-6">
         {{ $transactions->links() }}
     </div>
+</div>
+
+<script>
+document.getElementById('searchInput').addEventListener('input', function() {
+    let searchValue = this.value;
+    let filterValue = document.getElementById('filterStatus').value;
+    let url = new URL(window.location);
+    if (searchValue) url.searchParams.set('search', searchValue); else url.searchParams.delete('search');
+    if (filterValue) url.searchParams.set('status', filterValue); else url.searchParams.delete('status');
+    window.location.href = url.toString();
+});
+
+document.getElementById('filterStatus').addEventListener('change', function() {
+    let filterValue = this.value;
+    let searchValue = document.getElementById('searchInput').value;
+    let url = new URL(window.location);
+    if (filterValue) url.searchParams.set('status', filterValue); else url.searchParams.delete('status');
+    if (searchValue) url.searchParams.set('search', searchValue); else url.searchParams.delete('search');
+    window.location.href = url.toString();
+});
+</script>
 @endsection
