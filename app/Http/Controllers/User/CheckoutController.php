@@ -143,6 +143,11 @@ class CheckoutController extends Controller
                 'message' => $validated['message'] ?? null,
             ]);
 
+            // Ensure we set a stable order_id used by Midtrans
+            $generatedOrderId = $this->generateUniqueOrderId($transaction->id);
+            $transaction->order_id = $generatedOrderId;
+            $transaction->save();
+
             // Create transaction items
             foreach ($cartItems as $cartItem) {
                 TransactionItem::create([
@@ -158,10 +163,11 @@ class CheckoutController extends Controller
             }
             $payment = Payment::create([
                 'transaction_id' => $transaction->id,
+                'order_id' => $transaction->order_id,
                 'user_id' => Auth::id(),
                 'payment_method' => null,
                 'payment_gateway' => 'midtrans',
-                'gateway_reference' => (string) $transaction->id,
+                'gateway_reference' => $transaction->order_id,
                 'snap_token' => null,
                 'amount' => $total,
                 'status' => Payment::STATUS_PENDING,
@@ -206,8 +212,8 @@ class CheckoutController extends Controller
         $pending = $transaction->payments()->where('status', Payment::STATUS_PENDING)->latest()->first();
             if ($pending) {
             if (empty($pending->snap_token) && $pending->payment_gateway === 'midtrans') {
-                // Prefer using whatever gateway_reference was previously recorded, fall back to transaction id
-                $gatewayReference = $pending->gateway_reference ?? (string) $transaction->id;
+                // Prefer using whatever gateway_reference was previously recorded, fall back to transaction.order_id
+                $gatewayReference = $pending->gateway_reference ?? (string) $transaction->order_id;
                 try {
                     $newToken = $this->midtransService->createSnapToken($gatewayReference, $transaction->total_amount, $transaction->user);
                     $pending->update(['snap_token' => $newToken]);
@@ -247,7 +253,7 @@ class CheckoutController extends Controller
             }
         } else {
             if ($transaction->status === 'pending') {
-                $gatewayReference = (string) $transaction->id;
+                $gatewayReference = (string) $transaction->order_id;
                 $newToken = null;
                 try {
                     $newToken = $this->midtransService->createSnapToken($gatewayReference, $transaction->total_amount, $transaction->user);
@@ -273,6 +279,7 @@ class CheckoutController extends Controller
                 if ($newToken) {
                     $pending = Payment::create([
                         'transaction_id' => $transaction->id,
+                        'order_id' => $transaction->order_id,
                         'user_id' => Auth::id(),
                         'payment_method' => null,
                         'payment_gateway' => 'midtrans',
@@ -348,6 +355,13 @@ class CheckoutController extends Controller
         $midtransStatus = $statusResponse['transaction_status'] ?? ($statusResponse['status'] ?? null);
         $paymentStatus = $statusMap[$midtransStatus] ?? null;
 
+        // Verify gross amount matches stored transaction amount
+        $grossAmount = isset($statusResponse['gross_amount']) ? (int)$statusResponse['gross_amount'] : null;
+        if ($grossAmount !== null && $grossAmount !== (int)$transaction->total_amount) {
+            \Illuminate\Support\Facades\Log::warning('Midtrans notify amount mismatch', ['order_id' => $midtransOrderId, 'received' => $grossAmount, 'expected' => (int)$transaction->total_amount]);
+            $paymentStatus = Payment::STATUS_PENDING; // avoid marking success automatically
+        }
+
         // First try to find a payment matching the Midtrans order id, otherwise reuse a pending/failed attempt
         $payment = $transaction->payments()->where('gateway_reference', $midtransOrderId)->latest()->first();
         if (! $payment) {
@@ -358,10 +372,7 @@ class CheckoutController extends Controller
             // If no payment exists, create a record from the notification
             $payment = Payment::create([
                 'transaction_id' => $transaction->id,
-                'user_id' => $transaction->user_id,
-                'payment_method' => $statusResponse['payment_type'] ?? null,
-                'payment_gateway' => 'midtrans',
-                'gateway_reference' => $statusResponse['transaction_id'] ?? $midtransOrderId,
+                    'order_id' => $transaction->order_id,
                 'snap_token' => null,
                 'amount' => $transaction->total_amount,
                 'status' => $paymentStatus ?? Payment::STATUS_PENDING,

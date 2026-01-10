@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\TransactionController as AdminTransactionController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -107,11 +108,14 @@ Route::middleware(['auth'])->group(function () {
 // Admin routes (requires auth and is_admin middleware)
 Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+    // AJAX stats endpoint for live dashboard
+    Route::get('/dashboard/stats', [AdminDashboardController::class, 'stats'])->name('dashboard.stats');
     Route::resource('products', AdminProductController::class);
     // Product image management: delete image and set primary
     Route::delete('products/images/{image}', [AdminProductController::class, 'destroyImage'])->name('products.images.destroy');
     Route::post('products/{product}/images/{image}/primary', [AdminProductController::class, 'setPrimaryImage'])->name('products.images.setPrimary');
     Route::resource('categories', AdminCategoryController::class);
+    Route::resource('users', AdminUserController::class)->only(['index', 'edit', 'update', 'destroy']);
     Route::resource('transactions', AdminTransactionController::class)
         ->only(['index', 'show', 'update']);
     // Admin profile routes (handled by main ProfileController)
