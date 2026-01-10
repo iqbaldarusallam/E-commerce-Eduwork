@@ -38,13 +38,13 @@
         <table class="w-full">
             <thead class="bg-gray-50 border-b border-gray-200">
                 <tr>
-                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-900">Name</th>
-                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-900">Category</th>
-                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-900">Price</th>
-                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-900">Stock</th>
-                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-900">Weight</th>
-                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-900">Status</th>
-                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-900">Actions</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Name</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Category</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Price</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Stock</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Weight</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Status</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Actions</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
@@ -77,7 +77,7 @@
                                 </span>
                             @endif
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-700">{{ $product->weight ? $product->weight . ' g' : '-' }}</td>
+                        <td class="px-6 py-4 text-sm">{{ $product->weight ? $product->weight . ' g' : '-' }}</td>
                         <td class="px-6 py-4 text-sm">
                             <span class="px-3 py-1 {{ $product->active ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800' }} rounded-full text-xs font-semibold">
                                 {{ $product->active ? 'Active' : 'Inactive' }}

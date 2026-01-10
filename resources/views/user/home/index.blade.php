@@ -1,3 +1,5 @@
+
+
 @extends('layouts.userNavbar')
 
 @section('content')
@@ -7,28 +9,48 @@
             <!-- Sidebar -->
             <aside class="hidden lg:block col-span-1 border-r pr-4">
                 <ul class="space-y-3 text-sm">
-                    <li class="font-medium">Woman’s Fashion</li>
-                    <li class="font-medium">Men’s Fashion</li>
-                    <li class="text-gray-600">Electronics</li>
-                    <li class="text-gray-600">Home & Lifestyle</li>
-                    <li class="text-gray-600">Medicine</li>
-                    <li class="text-gray-600">Sports & Outdoor</li>
-                    <li class="text-gray-600">Baby’s & Toys</li>
-                    <li class="text-gray-600">Groceries & Pets</li>
-                    <li class="text-gray-600">Health & Beauty</li>
+
+                    @foreach ($categories as $category)
+                  
+                        <li class="text-gray-600">
+                            <a href="{{ route('user.products.category', $category->slug) }}">{{ $category->name }}</a>
+                        </li>
+                    @endforeach
                 </ul>
             </aside>
 
             <!-- Banner -->
-            <div class="lg:col-span-3 bg-black rounded-lg p-8 flex items-center justify-between text-white">
-                <div>
-                    <p class="text-md opacity-80">iPhone 14 Series</p>
-                    <h2 class="text-6xl font-bold mt-2">Up to 10% <br> off Voucher</h2>
-                    <a href="#" class="inline-block mt-4 underline">Shop Now →</a>
-                </div>
+            <div class="swiper hero-swiper lg:col-span-3 w-full border border-red-200">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide">
+                        <div class="bg-black rounded-lg p-8 flex items-center justify-between text-white">
+                            <div>
+                                <p class="text-md opacity-80">iPhone 14 Series</p>
+                                <h2 class="text-6xl font-bold mt-2">Up to 10% <br> off Voucher</h2>
+                                <a href="#" class="inline-block mt-4 text-lg border px-3 py-1 cursor-pointer">Shop Now
+                                    →</a>
+                            </div>
 
-                <img src="{{ asset('img/hero.png') }}" alt="" class="hidden md:block w-90">
+                            <img src="{{ asset('img/hero.png') }}" alt="" class="hidden md:block">
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="bg-black rounded-lg p-8 flex items-center justify-between text-white">
+                            <div>
+                                <p class="text-md opacity-80">iPhone 14 Series</p>
+                                <h2 class="text-6xl font-bold mt-2">Up to 10% <br> off Voucher</h2>
+                                <a href="#" class="inline-block mt-4 underline">Shop Now →</a>
+                            </div>
+
+                            <img src="{{ asset('img/hero.png') }}" alt="" class="hidden md:block">
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-pagination"></div>
             </div>
+
+
+
         </section>
         <section class="max-w-7xl mx-auto px-4 mt-10">
             <div class="flex items-center justify-between mb-6">
@@ -42,44 +64,46 @@
             </div>
 
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
-                <!-- Product Card -->
-                <div class="border rounded-lg p-4 text-sm">
-                    <img src="{{ asset('img/produk1.jpeg') }}" class="mb-3">
-                    <h3 class="font-medium">Keyboard Gamen</h3>
-                    <p class="text-red-500">Rp.310.000</p>
-                    <p class="text-xs line-through text-gray-400">Rp.660.000</p>
-                </div>
+                @foreach ($products as $product)
+                    <a href="{{ route('user.products.show', $product->slug) }}">
+                        <div class="border rounded-lg p-4 text-sm flex flex-col">
 
-                <div class="border rounded-lg p-4 text-sm">
-                    <img src="{{ asset('img/produk2.jpeg') }}" class="mb-3">
-                    <h3 class="font-medium">Monitor SPC</h3>
-                    <p class="text-red-500">Rp.610.000</p>
-                    <p class="text-xs line-through text-gray-400">Rp.1.100.000</p>
-                </div>
+                            {{-- IMAGE --}}
+                            @if ($product->images->first())
+                                <img src="{{ Storage::url($product->images->first()->url) }}"
+                                    class="mb-3 w-full h-40 object-cover rounded">
+                            @else
+                                <div class="mb-3 w-full h-40 bg-gray-200 flex items-center justify-center text-gray-400">
+                                    No Image
+                                </div>
+                            @endif
 
-                <div class="border rounded-lg p-4 text-sm">
-                    <img src="{{ asset('img/produk3.jpeg') }}" class="mb-3">
-                    <h3 class="font-medium">Gaming Pad Rexus</h3>
-                    <p class="text-red-500">Rp.210.000</p>
-                    <p class="text-xs line-through text-gray-400">Rp.400.000</p>
-                </div>
-                <div class="border rounded-lg p-4 text-sm">
-                    <img src="{{ asset('img/produk1.jpeg') }}" class="mb-3">
-                    <h3 class="font-medium">Keyboard Gamen</h3>
-                    <p class="text-red-500">Rp.310.000</p>
-                    <p class="text-xs line-through text-gray-400">Rp.660.000</p>
-                </div>
-                <div class="border rounded-lg p-4 text-sm">
-                    <img src="{{ asset('img/produk2.jpeg') }}" class="mb-3">
-                    <h3 class="font-medium">Monitor SPC</h3>
-                    <p class="text-red-500">Rp.610.000</p>
-                    <p class="text-xs line-through text-gray-400">Rp.1.100.000</p>
-                </div>
+                            {{-- NAME --}}
+                            <h3 class="font-medium text-sm line-clamp-2 min-h-[2.5rem]">
+                                {{ $product->name }}
+                            </h3>
+
+                            {{-- PRICE --}}
+                            <p class="text-red-500 mt-1">
+                                Rp {{ number_format($product->price, 0, ',', '.') }}
+                            </p>
+
+                            {{-- DISCOUNT --}}
+                            @if ($product->old_price)
+                                <p class="text-xs line-through text-gray-400">
+                                    Rp {{ number_format($product->old_price, 0, ',', '.') }}
+                                </p>
+                            @endif
+
+                        </div>
+                    </a>
+                @endforeach
             </div>
 
 
+
             <div class="text-center mt-8">
-                <a class="inline-block bg-red-500 text-white px-6 py-3 rounded">
+                <a href="{{ route('user.products.index') }}" class="inline-block bg-red-500 text-white px-6 py-3 rounded">
                     View All Products
                 </a>
             </div>
@@ -137,6 +161,64 @@
 
             </div>
         </section>
+
+        {{-- best sale --}}
+        <section class="max-w-7xl mx-auto px-4 mt-20">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-semibold">Best Selling Products</h2>
+                <a href="#" class="bg-red-500 text-white px-4 py-2 rounded text-sm">View All</a>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-6">
+                <div class="border rounded-lg p-4 text-sm">
+                    <img src="{{ asset('img/produk1.jpeg') }}" class="mb-3">
+                    <h3 class="font-medium">Keyboard Gamen</h3>
+                    <p class="text-red-500">Rp.310.000</p>
+                    <p class="text-xs line-through text-gray-400">Rp.660.000</p>
+                </div>
+
+                <div class="border rounded-lg p-4 text-sm">
+                    <img src="{{ asset('img/produk2.jpeg') }}" class="mb-3">
+                    <h3 class="font-medium">Monitor SPC</h3>
+                    <p class="text-red-500">Rp.610.000</p>
+                    <p class="text-xs line-through text-gray-400">Rp.1.100.000</p>
+                </div>
+
+                <div class="border rounded-lg p-4 text-sm">
+                    <img src="{{ asset('img/produk3.jpeg') }}" class="mb-3">
+                    <h3 class="font-medium">Gaming Pad Rexus</h3>
+                    <p class="text-red-500">Rp.210.000</p>
+                    <p class="text-xs line-through text-gray-400">Rp.400.000</p>
+                </div>
+                <div class="border rounded-lg p-4 text-sm">
+                    <img src="{{ asset('img/produk1.jpeg') }}" class="mb-3">
+                    <h3 class="font-medium">Keyboard Gamen</h3>
+                    <p class="text-red-500">Rp.310.000</p>
+                    <p class="text-xs line-through text-gray-400">Rp.660.000</p>
+                </div>
+                <div class="border rounded-lg p-4 text-sm">
+                    <img src="{{ asset('img/produk2.jpeg') }}" class="mb-3">
+                    <h3 class="font-medium">Monitor SPC</h3>
+                    <p class="text-red-500">Rp.610.000</p>
+                    <p class="text-xs line-through text-gray-400">Rp.1.100.000</p>
+                </div>
+            </div>
+        </section>
+        <section class="max-w-7xl mx-auto px-4 mt-20">
+            <div class="bg-black rounded-lg p-10 text-white flex justify-between items-center">
+                <div>
+                    <p class="text-green-400 text-sm mb-2">Categories</p>
+                    <h2 class="text-3xl font-bold mb-6">
+                        Enhance Your <br> Music Experience
+                    </h2>
+                    <a class="bg-green-500 text-black px-6 py-3 rounded">Buy Now</a>
+                </div>
+                <img src="{{ asset('img/speaker.png') }}" class="hidden md:block w-64">
+            </div>
+        </section>
+
+
+
 
 
     </div>
