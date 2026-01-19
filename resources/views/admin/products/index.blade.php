@@ -17,7 +17,7 @@
     <div class="bg-white rounded-lg shadow mb-6 p-4 flex items-center gap-4">
         <div class="flex-1 flex items-center gap-4">
             <div class="relative">
-                <select id="filterStatus" class="px-4 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <select id="filterStatus" class="px-8 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="">Filter</option>
                     <option value="instock">In Stock</option>
                     <option value="outofstock">Out of Stock</option>

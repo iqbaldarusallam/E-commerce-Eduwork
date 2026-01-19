@@ -13,7 +13,7 @@
     <div class="bg-white rounded-lg shadow mb-6 p-4 flex items-center gap-4">
         <div class="flex-1 flex items-center gap-4">
             <div>
-                <select id="filterStatus" class="px-4 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <select id="filterStatus" class="px-9 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="">All Status</option>
                     <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
                     <option value="paid" {{ request('status') === 'paid' ? 'selected' : '' }}>Paid</option>
@@ -26,7 +26,7 @@
                 <input id="searchInput" type="text" placeholder="Search by customer or order #..." value="{{ request('search') }}" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
         </div>
-        <!-- no extra buttons -->
+
     </div>
 
     <div class="bg-white rounded-lg shadow overflow-hidden">
