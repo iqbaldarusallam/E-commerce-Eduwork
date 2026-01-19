@@ -17,8 +17,5 @@ class HomeController extends Controller
     }
 
     // New contact method
-    public function contact()
-    {
-        return view('user.contact.index');
-    }
+   
 }
