@@ -44,6 +44,7 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     // Contact page route
     Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
+    Route::get('/about', [HomeController::class, 'about'])->name('about');
 
     // Maintain legacy '/profile' routes for backward compatibility
     Route::get('/profile', [ProfileController::class, 'edit']);

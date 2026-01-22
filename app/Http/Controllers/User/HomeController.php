@@ -16,9 +16,14 @@ class HomeController extends Controller
         return view('user.home.index', compact('categories', 'products'));
     }
 
-    // Contact page
-    public function contact()
+      public function contact()
     {
         return view('user.contact.index');
     }
+
+    public function about()
+    {
+        return view('user.about.index');
+    }
+
 }
