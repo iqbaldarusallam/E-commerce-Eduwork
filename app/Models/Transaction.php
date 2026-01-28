@@ -17,6 +17,7 @@ class Transaction extends Model
         'total_amount',
         'shipping_fee',
         'message',
+        'order_id',
     ];
 
     protected $casts = [
