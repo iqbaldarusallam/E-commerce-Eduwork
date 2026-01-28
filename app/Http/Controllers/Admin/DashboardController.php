@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
+use App\Models\Payment;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\User;
@@ -16,8 +17,7 @@ class DashboardController extends Controller
     public function index()
     {
         /* METRIC  */
-        $totalRevenue = Transaction::whereIn('status', ['paid', 'completed'])
-            ->sum(DB::raw('total_amount + shipping_fee'));
+        $totalRevenue = Payment::where('status', Payment::STATUS_SUCCESS)->sum('amount');
 
         // Order metrics
         $totalOrders      = Transaction::whereIn('status', ['paid', 'completed'])->count();
@@ -36,12 +36,12 @@ class DashboardController extends Controller
             ->get();
 
         /* WEEKLY REVENUE */
-        $weeklyRaw = Transaction::whereIn('status', ['paid', 'completed'])
-            ->whereBetween('created_at', [
+        $weeklyRaw = Payment::where('status', Payment::STATUS_SUCCESS)
+            ->whereBetween('paid_at', [
                 now()->subDays(6)->startOfDay(),
                 now()->endOfDay()
             ])
-            ->selectRaw('DATE(created_at) as date, SUM(total_amount + shipping_fee) as total')
+            ->selectRaw('DATE(paid_at) as date, SUM(amount) as total')
             ->groupBy('date')
             ->pluck('total', 'date');
 
@@ -55,9 +55,9 @@ class DashboardController extends Controller
         }
 
         /* MONTHLY REVENUE */
-        $monthlyRaw = Transaction::whereIn('status', ['paid', 'completed'])
-            ->whereYear('created_at', now()->year)
-            ->selectRaw('MONTH(created_at) as month, SUM(total_amount + shipping_fee) as total')
+        $monthlyRaw = Payment::where('status', Payment::STATUS_SUCCESS)
+            ->whereYear('paid_at', now()->year)
+            ->selectRaw('MONTH(paid_at) as month, SUM(amount) as total')
             ->groupBy('month')
             ->pluck('total', 'month');
 
@@ -72,8 +72,8 @@ class DashboardController extends Controller
         }
 
         /* YEARLY REVENUE */
-        $yearlyRevenue = Transaction::whereIn('status', ['paid', 'completed'])
-            ->selectRaw('YEAR(created_at) as year, SUM(total_amount + shipping_fee) as total')
+        $yearlyRevenue = Payment::where('status', Payment::STATUS_SUCCESS)
+            ->selectRaw('YEAR(paid_at) as year, SUM(amount) as total')
             ->groupBy('year')
             ->orderBy('year')
             ->pluck('total', 'year');
@@ -124,8 +124,7 @@ class DashboardController extends Controller
             return [$status => (int) ($orderStatusRaw[$status] ?? 0)];
         });
 
-        $totalRevenue = Transaction::whereIn('status', ['paid', 'completed'])
-            ->sum(DB::raw('total_amount + shipping_fee'));
+        $totalRevenue = Payment::where('status', Payment::STATUS_SUCCESS)->sum('amount');
 
         return response()->json([
             'totalRevenue' => (int) $totalRevenue,
