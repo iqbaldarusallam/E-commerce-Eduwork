@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Payment;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class WebhookController extends Controller
@@ -21,7 +22,7 @@ class WebhookController extends Controller
                 return response()->json(['status' => 'error'], 403);
             }
 
-            $transaction = Transaction::findOrFail($request->order_id);
+            $transaction = Transaction::where('order_id', $request->order_id)->firstOrFail();
 
 
             // Map to payment statuses and update/create payment record
@@ -37,30 +38,34 @@ class WebhookController extends Controller
             $midtransStatus = $request->transaction_status ?? null;
             $paymentStatus = $statusMap[$midtransStatus] ?? null;
 
-            // Find a pending payment for this transaction or create one
-            $payment = $transaction->payments()->whereIn('status', [Payment::STATUS_PENDING, Payment::STATUS_FAILED])->latest()->first();
-            if (! $payment) {
+            // Find existing payment or create new one (idempotent)
+            $payment = Payment::where('gateway_reference', $request->transaction_id ?? $request->order_id)
+                ->where('transaction_id', $transaction->id)
+                ->first();
+
+            if (!$payment) {
                 $payment = Payment::create([
                     'transaction_id' => $transaction->id,
                     'user_id' => $transaction->user_id,
-                    'payment_method' => 'midtrans',
                     'payment_method' => $request->payment_type ?? null,
                     'payment_gateway' => 'midtrans',
-                    // Prefer Midtrans transaction_id (gateway's unique id) if present
-                    'gateway_reference' => $request->transaction_id ?? $request->order_id ?? $transaction->id,
+                    'gateway_reference' => $request->transaction_id ?? $request->order_id,
                     'snap_token' => null,
                     'amount' => $transaction->total_amount,
                     'status' => $paymentStatus ?? Payment::STATUS_PENDING,
                     'response_payload' => $request->all(),
+                    'paid_at' => in_array($paymentStatus, [Payment::STATUS_SUCCESS]) ? now() : null,
                 ]);
             } else {
-                $payment->update([
-                    'status' => $paymentStatus ?? $payment->status,
-                    'response_payload' => $request->all(),
-                    'payment_method' => $request->payment_type ?? $payment->payment_method,
-                    'gateway_reference' => $request->transaction_id ?? $payment->gateway_reference,
-                    'paid_at' => in_array($paymentStatus, [Payment::STATUS_SUCCESS]) ? now() : $payment->paid_at,
-                ]);
+                // Update only if status is different
+                if ($payment->status !== $paymentStatus) {
+                    $payment->update([
+                        'status' => $paymentStatus,
+                        'response_payload' => $request->all(),
+                        'payment_method' => $request->payment_type ?? $payment->payment_method,
+                        'paid_at' => in_array($paymentStatus, [Payment::STATUS_SUCCESS]) ? now() : $payment->paid_at,
+                    ]);
+                }
             }
 
             if ($payment->status === Payment::STATUS_SUCCESS) {
